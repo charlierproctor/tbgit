@@ -1,0 +1,37 @@
+#!/usr/bin/env ruby
+
+require 'tbgit'
+
+tbgit = Main::TBGit.new
+
+case ARGV[0] 
+when "setup"
+	tbgit.gather
+
+	tbgit.add_remote_all
+	tbgit.spacer
+
+	tbgit.add_remotes
+	tbgit.spacer
+
+	tbgit.git_update
+	tbgit.spacer
+
+	tbgit.create_local_tracking_remotes
+	tbgit.switch_to_master
+	tbgit.spacer
+
+	tbgit.git_remote
+	tbgit.spacer
+
+	tbgit.git_branch
+	tbgit.spacer
+when "pull"
+	tbgit.update_repos(ARGV[0])	
+when "push"
+	tbgit.update_repos(ARGV[0])	
+when "commit"
+	tbgit.commit_all
+when "merge"
+	tbgit.merge_from
+end
