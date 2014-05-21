@@ -162,9 +162,8 @@ module Main
 	  			system commit_command
 	  		end
 
-	  		switch_to_master
-
   		end
+	  		switch_to_master
 
   	end
 
