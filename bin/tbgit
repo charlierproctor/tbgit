@@ -8,8 +8,8 @@ case ARGV[0]
 when "setup"
 	tbgit.gather
 
-	tbgit.add_remote_all
-	tbgit.spacer
+	# tbgit.add_remote_all
+	# tbgit.spacer
 
 	tbgit.add_remotes
 	tbgit.spacer
@@ -34,4 +34,14 @@ when "commit"
 	tbgit.commit_all
 when "merge"
 	tbgit.merge_from
+when "add-remotes"
+	tbgit.gather
+	tbgit.spacer
+
+	tbgit.add_remotes
+when "create-locals"
+	tbgit.gather
+	tbgit.spacer
+	
+	tbgit.create_local_tracking_remotes
 end
