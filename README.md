@@ -1,7 +1,7 @@
 # Tbgit
 
 TBGit is a command-line utility to facilitate the management of multiple GitHub student repositories.
-        ~ created by Charlie Proctor at 2014 YEI Tech Bootcamp
+- created by Charlie Proctor at 2014 YEI Tech Bootcamp
 
 ## Installation
 
