@@ -107,30 +107,31 @@ module Main
   			confirm("Each local student branch will be pushed to their remote master branch. Continue?")
   		else
   			confirm("Each remote student master branch will be pulled to the local branch. Continue?")
-  			all_remotes = all_remotes_list
-	  		all_remotes.each do |branch|
-	  			branch.delete!("\n")
+		end
 
-	  			if branch != "origin"
-		  			checkout_command = "git checkout " + branch 
-		  			if pushpull == "push"
-		  				pushpull_command = "git push " + branch + " " + branch + ":master"
-		  			else
-		  				pushpull_command = "git pull " + branch + " master"
-		  			end
+		all_remotes = all_remotes_list
+  		all_remotes.each do |branch|
+  			branch.delete!("\n")
 
-		  			puts checkout_command
-		  			system checkout_command
+  			if branch != "origin"
+	  			checkout_command = "git checkout " + branch 
+	  			if pushpull == "push"
+	  				pushpull_command = "git push " + branch + " " + branch + ":master"
+	  			else
+	  				pushpull_command = "git pull " + branch + " master"
+	  			end
 
-		  			puts pushpull_command
-		  			system pushpull_command
-		  		end
+	  			puts checkout_command
+	  			system checkout_command
 
-		  		switch_to_master
-
+	  			puts pushpull_command
+	  			system pushpull_command
 	  		end
-	  	end
 
+  		end
+	
+	  		switch_to_master
+  	
   	end
 
   	#merges from master (or another branch) to each student branch and commits the changes
@@ -166,9 +167,9 @@ module Main
 	  			system commit_command
 	  		end
 
-	  		switch_to_master
-
   		end
+
+	  		switch_to_master
 
   	end
 
