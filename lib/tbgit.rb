@@ -9,6 +9,21 @@ module Main
   		puts "********************************************************************************"
   	end
 
+  	#three simple git methods
+	def switch_to_master
+		puts "git checkout master"
+		system "git checkout master"
+	end
+	def git_remote
+		puts "git remote"
+		system "git remote"
+	end
+	def git_branch
+		puts "git branch"
+		system "git branch"
+	end
+
+	#gather necessary information
     def gather
     	puts 'Students file |../students|:'
     	@students_file = $stdin.gets.chomp
@@ -29,26 +44,13 @@ module Main
     	end
     end
 
-  #   def add_remote_all
-  #   	students = IO.readlines(@students_file)
+    #update remotes
+	def git_update
+		puts "git remote update"
+ 		system "git remote update"
+ 	end
 
-		# puts "Adding students' repositories to remote 'all', to facilitate `git push all master`"
-		# puts "Manually adding the following to .git/config, in order to create remote 'all':"
-		# open('.git/config', 'a') { |f|
-		# 	f.puts '[remote "all"]'
-		# 	puts '[remote "all"]'
-
-		# students.each do |username|
-		# 	username.delete!("\n")
-		# 	str =  "\turl = https://github.com/"+@organization+"/" + username + "-"+@reponame+".git"
-		# 	puts str
-		# 	f.puts str
-		# end
-
-		# }
-
-  #   end
-
+    #add each student repository as a remote
     def add_remotes
     	students = IO.readlines(@students_file)
     	students.each do |username|
@@ -61,11 +63,7 @@ module Main
 		end
 	end
 
-	def git_update
-		puts "git remote update"
- 		system "git remote update"
- 	end
-
+	#create local branches to track remote student repositories
  	def create_local_tracking_remotes
  	    students = IO.readlines(@students_file)
  		students.each do |username|
@@ -80,32 +78,7 @@ module Main
 
 	end
 
-	def switch_to_master
-		puts "git checkout master"
-		system "git checkout master"
-	end
-
-	def git_remote
-		puts "git remote"
-		system "git remote"
-	end
-
-	def git_branch
-		puts "git branch"
-		system "git branch"
-	end
-  
-  	# def git_push_all
-  	# 	git_branch
-
-  	# 	puts "\nPush current branch to all student repositories? (y/n)"
-  	# 	yn = $stdin.gets.chomp
-  	# 	if yn== 'y'
-  	# 		puts "git push all master"
-  	# 		system "git push all master"
-  	# 	end
-  	# end
-
+	#returns a list of students
   	def all_remotes_list
   		remote_file = Tempfile.new("remotes")
   		system "git remote >> " + remote_file.path
@@ -115,17 +88,18 @@ module Main
   		return IO.readlines(remote_file)
 	end
 
+	#used for push / pull
   	def update_repos(pushpull)
   		all_remotes = all_remotes_list
   		all_remotes.each do |branch|
   			branch.delete!("\n")
 
-  			if (branch != "all")&&(branch != "origin")
+  			if branch != "origin"
 	  			checkout_command = "git checkout " + branch 
 	  			if pushpull == "push"
-	  				pushpull_command = "git " + pushpull + " " + branch + " master"
+	  				pushpull_command = "git push " + branch + " " + branch + ":master"
 	  			else
-	  				pushpull_command = "git " + pushpull + " " + branch + " master"
+	  				pushpull_command = "git pull " + branch + " master"
 	  			end
 
 	  			puts checkout_command
@@ -141,54 +115,37 @@ module Main
 
   	end
 
-  	def commit_all
+  	#merges from master (or another branch) to each student branch and commits the changes
+  	def merge_and_commit
+
+  		confirm("This performs a merge and commit on each local student branch. You will be prompted for the branch to merge from (normally master). Would you like to continue?")
+  		puts "Merge from branch: "
+  		merge_branch = $stdin.gets.chomp
 
   		puts "Commit Message: "
   		message = $stdin.gets.chomp
 
   		all_remotes = all_remotes_list
-
   		all_remotes.each do |branch|
   			branch.delete!("\n")
 
-  			if (branch != "all")&&(branch != "origin")
+  			if branch != "origin"
 	  			checkout_command = "git checkout " + branch 
-	  			stage_changes = "git add --all"
+	  			merge_command = "git merge --no-commit " + merge_branch.to_s
+	  		  	stage_changes = "git add --all"		
 	  			commit_command = "git commit -am '" + message + "'"
-
-	  			puts checkout_command
-	  			system checkout_command
-
-	  			puts stage_changes
-	  			system stage_changes
-
-	  			puts commit_command
-	  			system commit_command
-	  		end
-
-  		end
-	  		switch_to_master
-
-  	end
-
-  	def merge_from
-
-  		puts "Merge from branch: "
-  		merge_branch = $stdin.gets.chomp
-
-  		all_remotes = all_remotes_list
-  		all_remotes.each do |branch|
-  			branch.delete!("\n")
-
-  			if (branch != "all")&&(branch != "origin")
-	  			checkout_command = "git checkout " + branch 
-	  			merge_command = "git merge " + merge_branch.to_s
 
 	  			puts checkout_command
 	  			system checkout_command
 
 	  			puts merge_command
 	  			system merge_command
+
+	  			puts stage_changes
+	  			system stage_changes
+
+	  			puts commit_command
+	  			system commit_command
 	  		end
 
 	  		switch_to_master
