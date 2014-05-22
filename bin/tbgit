@@ -29,6 +29,8 @@ when "push"
 	tbgit.update_repos(ARGV[0])	
 when "merge"
 	tbgit.merge_and_commit
+when "status"
+	tbgit.git_status
 when "add-remotes"
 	tbgit.gather
 	tbgit.spacer

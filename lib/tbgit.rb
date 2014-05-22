@@ -173,6 +173,16 @@ module Main
 
   	end
 
+  	def git_status
+  		all_remotes = all_remotes_list
+  		all_remotes.each do |branch|
+  			branch.delete!("\n")
+
+  			puts "git status " + branch
+  			system "git status " + branch
+
+  		end
+  	end
 
   	def help
   		puts ""
@@ -184,6 +194,7 @@ module Main
   		puts "		~ push  	pushes all local student branches to their remote master branches"
   		puts "		~ pull   	pulls all remote master branches to local student branches"
   		puts "		~ merge   	merges a specified branch with each student branch and then commits the changes"
+  		puts "		~ status 	runs `git status` on each students branch and displays the results"
   		puts ""
   		puts "		~ add-remotes  	adds each student's repository as a remote"
   		puts "		~ create-locals 	creates a local branch to track the students remote master branch"
