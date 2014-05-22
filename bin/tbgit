@@ -18,9 +18,6 @@ when "setup"
 	tbgit.switch_to_master
 	tbgit.spacer
 
-	tbgit.update_repos("pull")
-	tbgit.spacer
-
 	tbgit.git_remote
 	tbgit.spacer
 
