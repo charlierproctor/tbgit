@@ -177,11 +177,52 @@ module Main
   		all_remotes = all_remotes_list
   		all_remotes.each do |branch|
   			branch.delete!("\n")
+	  		checkout_command = "git checkout " + branch 
+
+	  		puts checkout_command
+	  		system checkout_command
 
   			puts "git status " + branch
   			system "git status " + branch
 
   		end
+  		switch_to_master
+  	end
+
+  	def on_each
+  		puts "Enter the commands you would like to have executed on each branch, one on each line."
+  		puts "'<branch>' will be replaced by the current checked-out branch. Enter a blank line to finish."
+  		done = false
+  		input = Array.new
+  		while !done
+  			text = $stdin.gets.chomp
+  			if text == ""
+  				done = true
+  			else
+  				input << text
+  			end
+  		end
+
+  		all_remotes = all_remotes_list
+  		all_remotes.each do |branch|
+  			branch.delete!("\n")
+
+  			if branch != "origin"
+		  		checkout_command = "git checkout " + branch 
+
+		  		puts checkout_command
+		  		system checkout_command
+
+	  			input.each do |command|
+	  				final_command = command.gsub("<branch>", branch)
+
+	  				puts final_command
+	  				system final_command
+	  			end
+  			end
+
+  		end
+  		switch_to_master
   	end
 
   	def help
@@ -195,6 +236,7 @@ module Main
   		puts "		~ pull   	pulls all remote master branches to local student branches"
   		puts "		~ merge   	merges a specified branch with each student branch and then commits the changes"
   		puts "		~ status 	runs `git status` on each students branch and displays the results"
+  		puts "		~ each 		executes a specified series of commands on each local student branch"
   		puts ""
   		puts "		~ add-remotes  	adds each student's repository as a remote"
   		puts "		~ create-locals 	creates a local branch to track the students remote master branch"

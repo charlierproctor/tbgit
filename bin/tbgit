@@ -31,6 +31,8 @@ when "merge"
 	tbgit.merge_and_commit
 when "status"
 	tbgit.git_status
+when "each"
+	tbgit.on_each
 when "add-remotes"
 	tbgit.gather
 	tbgit.spacer
