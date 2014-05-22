@@ -43,5 +43,5 @@ when "create-locals"
 	
 	tbgit.create_local_tracking_remotes
 when "help"
-	system "cat ../help.txt"
+	tbgit.help
 end
