@@ -9,6 +9,17 @@ module Main
   		puts "********************************************************************************"
   	end
 
+  	#confirms a given message
+  	def confirm(message)
+  		puts message + " (y/n)"
+  		response = $stdin.gets.chomp
+  		if response == 'y'
+  			#do nothing
+  		else
+  			exit
+  		end
+  	end
+
   	#three simple git methods
 	def switch_to_master
 		puts "git checkout master"
@@ -52,6 +63,7 @@ module Main
 
     #add each student repository as a remote
     def add_remotes
+    	confirm("Each student repository will be added as a remote. Continue?")
     	students = IO.readlines(@students_file)
     	students.each do |username|
 			username.delete!("\n")
@@ -65,6 +77,7 @@ module Main
 
 	#create local branches to track remote student repositories
  	def create_local_tracking_remotes
+ 		confirm("Local branches will be created to track remote student repositories. Continue?")
  	    students = IO.readlines(@students_file)
  		students.each do |username|
 			username.delete!("\n")
@@ -90,6 +103,10 @@ module Main
 
 	#used for push / pull
   	def update_repos(pushpull)
+  		if pushpull == "push"
+  			confirm("Each local student branch will be pushed to their remote master branch. Continue?")
+  		else
+  			confirm("Each remote student master branch will be pulled to the local branch. Continue?")
   		all_remotes = all_remotes_list
   		all_remotes.each do |branch|
   			branch.delete!("\n")
@@ -118,7 +135,7 @@ module Main
   	#merges from master (or another branch) to each student branch and commits the changes
   	def merge_and_commit
 
-  		confirm("This performs a merge and commit on each local student branch. You will be prompted for the branch to merge from (normally master). Would you like to continue?")
+  		confirm("A merge and commit will be performed on each local student branch (from the branch you specify). Continue?")
   		puts "Merge from branch: "
   		merge_branch = $stdin.gets.chomp
 

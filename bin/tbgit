@@ -13,7 +13,7 @@ when "setup"
 
 	tbgit.git_update
 	tbgit.spacer
-	
+
 	tbgit.create_local_tracking_remotes
 	tbgit.switch_to_master
 	tbgit.spacer
@@ -42,4 +42,6 @@ when "create-locals"
 	tbgit.spacer
 	
 	tbgit.create_local_tracking_remotes
+when "help"
+	system "cat ../help.txt"
 end
