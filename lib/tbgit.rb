@@ -173,23 +173,8 @@ module Main
 
   	end
 
-  	def git_status
-  		all_remotes = all_remotes_list
-  		all_remotes.each do |branch|
-  			branch.delete!("\n")
-	  		checkout_command = "git checkout " + branch 
-
-	  		puts checkout_command
-	  		system checkout_command
-
-  			puts "git status " + branch
-  			system "git status " + branch
-
-  		end
-  		switch_to_master
-  	end
-
-  	def on_each
+  	#gathers the commands to be executed, and then calls on_each_exec(input)
+  	def on_each_gather
   		puts "Enter the commands you would like to have executed on each branch, one on each line."
   		puts "'<branch>' will be replaced by the current checked-out branch. Enter a blank line to finish."
   		done = false
@@ -203,6 +188,12 @@ module Main
   			end
   		end
 
+  		on_each_exec(input)
+
+  	end
+
+  	#takes an array of commands, and executes each command on each student branch
+  	def on_each_exec(input)   
   		all_remotes = all_remotes_list
   		all_remotes.each do |branch|
   			branch.delete!("\n")
@@ -225,6 +216,11 @@ module Main
   		switch_to_master
   	end
 
+  	
+  	def git_status
+  		on_each_exec(["git status <branch>"])
+  	end
+  	
   	def help
   		puts ""
   		puts "TBGit is a command-line utility to facilitate the management of multiple GitHub student repositories."

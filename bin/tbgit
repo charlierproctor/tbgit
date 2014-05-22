@@ -32,7 +32,7 @@ when "merge"
 when "status"
 	tbgit.git_status
 when "each"
-	tbgit.on_each
+	tbgit.on_each_gather
 when "add-remotes"
 	tbgit.gather
 	tbgit.spacer
