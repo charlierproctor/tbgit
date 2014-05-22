@@ -221,6 +221,26 @@ module Main
   		on_each_exec(["git status <branch>"])
   	end
   	
+  	def spec
+  		puts "Please specify the relative path from your pwd to the rspec file you would like to spec, eg. 'hw1/spec/spec.rb'"
+  		specfile = $stdin.gets.chomp
+  		puts "Would you like to save the results to a text file? If so, specify the path to the file you would like to create (preferrably outside your student repo directory)"
+  		puts "If not, just press 'enter'"
+  		textoutput = $stdin.gets.chomp
+  		if textoutput != ""
+	  		confirm("'rspec " + specfile + "' will be executed on each student's local branch. Results will be saved to " + textoutput + ". Continue?")
+	  		puts "Beginning spec process.... you will not see any output until this operation is complete."
+	  		$stdout = File.open(textoutput, 'w')
+	  		on_each_exec("rspec " +specfile)
+	  		$stdout = STDOUT
+	  		puts "Process complete. Go take a look at " + textoutput
+	  	else 
+	  		confirm("'rspec " + specfile + "' will be executed on each student's local branch. Results will be outputed to the terminal. Continue?")
+	  		on_each_exec("rspec " +specfile)
+	  	end
+
+  	end
+
   	def help
   		puts ""
   		puts "TBGit is a command-line utility to facilitate the management of multiple GitHub student repositories."

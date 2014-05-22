@@ -33,6 +33,8 @@ when "status"
 	tbgit.git_status
 when "each"
 	tbgit.on_each_gather
+when "spec"
+	tbgit.spec
 when "add-remotes"
 	tbgit.gather
 	tbgit.spacer
