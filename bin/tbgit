@@ -42,6 +42,6 @@ when "create-locals"
 	tbgit.spacer
 	
 	tbgit.create_local_tracking_remotes
-when "help"
+else
 	tbgit.help
 end
