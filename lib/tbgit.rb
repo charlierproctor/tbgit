@@ -180,20 +180,26 @@ module Main
   	def spec
   		puts "Please specify the relative path from your pwd to the rspec file you would like to spec, eg. 'hw1/spec/spec.rb'"
   		specfile = $stdin.gets.chomp
-  		puts "Where would you like to save the master copy of all results?"
-  		puts "**Must be outside the student's repo directory, eg. '../results.txt'**"
-  		mastercopy = $stdin.gets.chomp
+
   		puts "Where would you like to save each student's individual results?"
   		puts "**Must be inside the student's repo directory, eg. 'hw1/spec/results.txt'**"
   		studentcopy = $stdin.gets.chomp
+
+  		puts "In which folder would you like to save a copy of all results?"
+  		puts "**Must be outside the student's repo directory, eg. '../results'**"
+  		mastercopy = $stdin.gets.chomp
+
+  		puts "mkdir " + mastercopy
+  		system "mkdir " + mastercopy
+
   		puts "Commit message (commiting each student's results to their repo):"
   		commit_message = $stdin.gets.chomp
+
   		confirm("'rspec " + specfile + "' will be executed on each student's local branch. \
   			Individual results will be saved to " + studentcopy + " and master results to " + mastercopy + ". Continue?")
 
   		on_each_exec(["rspec " +specfile + " > " + studentcopy,   	#overwrite
-  			"echo '<branch>' >> " + mastercopy,
-  			"cat " + studentcopy + " >> " + mastercopy, 			#append
+  			"rspec --format json --out " + mastercopy + "/<branch> " + specfile,
   		 	"git add --all",
   		 	"git commit -am '" + commit_message + "'",
   		 	"git push <branch> <branch>:master"])
