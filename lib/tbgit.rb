@@ -151,24 +151,35 @@ module Main
   	#takes an array of commands, and executes each command on each student branch
   	def on_each_exec(input)   
   		all_remotes = all_remotes_list
+  		output_array = Array.new
+
   		all_remotes.each do |branch|
-  			branch.delete!("\n")
+  			Thread.new{
+  				branch.delete!("\n")
 
-  			if branch != "origin"
-		  		checkout_command = "git checkout " + branch 
+	  			if branch != "origin"
+			  		checkout_command = "git checkout " + branch 
 
-		  		puts checkout_command
-		  		system checkout_command
+			  		results = checkout_command
+			  		results += system checkout_command
 
-	  			input.each do |command|
-	  				final_command = command.gsub("<branch>", branch)
+		  			input.each do |command|
+		  				final_command = command.gsub("<branch>", branch)
 
-	  				puts final_command
-	  				system final_command
+		  				results += final_command
+		  				results += system final_command
+		  			end
 	  			end
-  			end
+
+	  			output_array += results
+  			}
 
   		end
+
+  		output_array.each do |output|
+  			puts output
+  		end
+
   		switch_to_master
   	end
 
