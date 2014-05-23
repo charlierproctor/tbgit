@@ -122,32 +122,10 @@ module Main
   		puts "Commit Message: "
   		message = $stdin.gets.chomp
 
-  		all_remotes = all_remotes_list
-  		all_remotes.each do |branch|
-  			branch.delete!("\n")
-
-  			if branch != "origin"
-	  			checkout_command = "git checkout " + branch 
-	  			merge_command = "git merge --no-commit " + merge_branch.to_s
-	  		  	stage_changes = "git add --all"		
-	  			commit_command = "git commit -am '" + message + "'"
-
-	  			puts checkout_command
-	  			system checkout_command
-
-	  			puts merge_command
-	  			system merge_command
-
-	  			puts stage_changes
-	  			system stage_changes
-
-	  			puts commit_command
-	  			system commit_command
-	  		end
-
-  		end
-
-	  		switch_to_master
+		commands = ["git merge --no-commit " + merge_branch.to_s,
+	  		  		"git add --all",
+	  				"git commit -am '" + message + "'"]
+	  	on_each_exec(commands)
 
   	end
 
