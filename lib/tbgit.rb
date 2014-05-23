@@ -224,20 +224,22 @@ module Main
   	def spec
   		puts "Please specify the relative path from your pwd to the rspec file you would like to spec, eg. 'hw1/spec/spec.rb'"
   		specfile = $stdin.gets.chomp
-  		puts "Would you like to save the results to a text file? If so, specify the path to the file you would like to create (preferrably outside your student repo directory)"
-  		puts "If not, just press 'enter'"
-  		textoutput = $stdin.gets.chomp
-  		if textoutput != ""
-	  		confirm("'rspec " + specfile + "' will be executed on each student's local branch. Results will be saved to " + textoutput + ". Continue?")
-	  		puts "Beginning spec process.... you will not see any output until this operation is complete."
-	  		$stdout = File.open(textoutput, 'w')
-	  		on_each_exec("rspec " +specfile)
-	  		$stdout = STDOUT
-	  		puts "Process complete. Go take a look at " + textoutput
-	  	else 
-	  		confirm("'rspec " + specfile + "' will be executed on each student's local branch. Results will be outputed to the terminal. Continue?")
-	  		on_each_exec("rspec " +specfile)
-	  	end
+  		puts "Where would you like to save the master copy of all results?"
+  		puts "**Must be outside the student's repo directory, eg. '../results.txt'**"
+  		mastercopy = $stdin.gets.chomp
+  		puts "Where would you like to save each student's individual results?"
+  		puts "**Must be inside the student's repo directory, eg. 'hw1/spec/results.txt'**"
+  		studentcopy = $stdin.gets.chomp
+  		puts "Commit message (commiting each student's results to their repo):"
+  		commit_message = $stdin.gets.chomp
+  		confirm("'rspec " + specfile + "' will be executed on each student's local branch. \\
+  			Individual results will be saved to " + studentcopy + " and master results to " + mastercopy + ". Continue?")
+
+  		on_each_exec(["rspec " +specfile + " >> " + studentcopy,
+  			"File.open('"+mastercopy+"', 'a') {|f| f.write('`cat studentcopy`') }"
+  		 	"git add --all",
+  		 	"git commit -am '" + commit_message + "'",
+  		 	"git push <branch> <branch>:master"])
 
   	end
 
