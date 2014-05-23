@@ -1,5 +1,6 @@
 require "tbgit/version"
 require "tempfile"
+require "score_parser"
 
 module Main
 
@@ -203,6 +204,9 @@ module Main
   		 	"git add --all",
   		 	"git commit -am '" + commit_message + "'",
   		 	"git push <branch> <branch>:master"])
+
+  	 	my_parser = Parser.new
+  	 	my_parser.score_parse(mastercopy)
 
   	end
 
