@@ -232,11 +232,12 @@ module Main
   		studentcopy = $stdin.gets.chomp
   		puts "Commit message (commiting each student's results to their repo):"
   		commit_message = $stdin.gets.chomp
-  		confirm("'rspec " + specfile + "' will be executed on each student's local branch. \\
+  		confirm("'rspec " + specfile + "' will be executed on each student's local branch. \
   			Individual results will be saved to " + studentcopy + " and master results to " + mastercopy + ". Continue?")
 
-  		on_each_exec(["rspec " +specfile + " >> " + studentcopy,
-  			"File.open('"+mastercopy+"', 'a') {|f| f.write('`cat studentcopy`') }"
+  		on_each_exec(["rspec " +specfile + " > " + studentcopy,   	#overwrite
+  			"echo '<branch>' >> " + mastercopy,
+  			"cat " + studentcopy + " >> " + mastercopy, 			#append
   		 	"git add --all",
   		 	"git commit -am '" + commit_message + "'",
   		 	"git push <branch> <branch>:master"])
@@ -255,6 +256,7 @@ module Main
   		puts "		~ merge   	merges a specified branch with each student branch and then commits the changes"
   		puts "		~ status 	runs `git status` on each students branch and displays the results"
   		puts "		~ each 		executes a specified series of commands on each local student branch"
+  		puts "		~ spec 		runs rspec on specified files in a students repo"
   		puts ""
   		puts "		~ add-remotes  	adds each student's repository as a remote"
   		puts "		~ create-locals 	creates a local branch to track the students remote master branch"

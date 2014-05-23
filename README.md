@@ -16,6 +16,7 @@ TBGit is a command-line utility to facilitate the management of multiple GitHub 
 		- merge   	merges a specified branch with each student branch and then commits the changes
 		- status 	runs `git status` on each students branch and displays the results
 		- each 		executes a specified series of commands on each local student branch
+		- spec 		runs rspec on specified files in a students repo
 
 		- add-remotes  	adds each student's repository as a remote
 		- create-locals 	creates a local branch to track the students remote master branch
