@@ -14,6 +14,7 @@ Gem::Specification.new do |spec|
   spec.license       = "MIT"
 
   spec.files         = `git ls-files -z`.split("\x0")
+  spec.files         += Dir['lib/*.rb']  #add in any .rb files in lib
   spec.executables   = ["tbgit"]
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ["lib"]
