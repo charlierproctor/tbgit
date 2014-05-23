@@ -113,6 +113,11 @@ module Main
 		end
   	end
 
+  	def push_origin #push all student branches to our origin
+  		confirm("Each local student branch will be pushed to the the origin remote. Continue?")
+  		on_each_exec(["git push origin <branch>"])
+  	end
+
   	#merges from master (or another branch) to each student branch and commits the changes
   	def merge_and_commit
 

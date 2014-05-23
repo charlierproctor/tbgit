@@ -29,6 +29,8 @@ when "pull"
 	tbgit.update_repos(ARGV[0])	
 when "push"
 	tbgit.update_repos(ARGV[0])	
+when "push-origin"
+	tbgit.push_origin
 when "merge"
 	tbgit.merge_and_commit
 when "status"
