@@ -38,7 +38,7 @@ when "status"
 when "each"
 	tbgit.on_each_gather
 when "spec"
-	tbgit.spec(ARGV[1],ARGV[2],ARGV[3],ARGV[4],ARGV[5])
+	tbgit.spec(ARGV[1],ARGV[2],ARGV[3],ARGV[4],ARGV[5],ARGV[6])
 when "add-remotes"
 	tbgit.gather(ARGV[1],ARGV[2],ARGV[3])
 	tbgit.spacer

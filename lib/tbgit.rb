@@ -207,7 +207,7 @@ module Main
   		on_each_exec(["git status <branch>"])
   	end
   	
-  	def spec(flag,specfile,studentcopy,mastercopy,commit_message)
+  	def spec(flag,specfile,studentcopy,mastercopy,commit_message,student)
 
   		if 	specfile==nil
 	  		puts "Please specify the relative path from your pwd to the rspec file you would like to spec, eg. 'hw1/spec/spec.rb'"
@@ -234,14 +234,31 @@ module Main
 	  		commit_message = $stdin.gets.chomp
 	  	end
 
-  		confirm(flag,"'rspec " + specfile + "' will be executed on each student's local branch. \
-  			Individual results will be saved to " + studentcopy + " and master results to " + mastercopy + ". Continue?")
+	  	if student==nil
+	  		puts "Type 'all' to spec all student branches. Otherwise, please specify a student to spec."
+	  		student = $stdin.gets.chomp
+	  	end
+	  	
+	  	if student=="all"
+	  		confirm(flag,"'rspec " + specfile + "' will be executed on each student's local branch. 
+	  			Individual results will be saved to " + studentcopy + " and master results to " + mastercopy + ". Continue?")
 
-  		on_each_exec(["rspec " +specfile + " > " + studentcopy,   	#overwrite
-  			"rspec --format json --out " + mastercopy + "/<branch> " + specfile,
-  		 	"git add --all",
-  		 	"git commit -am '" + commit_message + "'",
-  		 	"git push <branch> <branch>:master"])
+	  		on_each_exec(["rspec " +specfile + " > " + studentcopy,   	#overwrite
+	  			"rspec --format json --out " + mastercopy + "/<branch> " + specfile,
+	  		 	"git add --all",
+	  		 	"git commit -am '" + commit_message + "'",
+	  		 	"git push <branch> <branch>:master"])
+	  	else
+	  	#TODO -- individual student spec throws error
+	  		system("git checkout " + student)
+	  		system("rspec " + specfile + " > " + studentcopy)
+	  		system("rspec --format json --out " + mastercopy + "/<branch> " + specfile)
+	  		system("git add --all")
+	  		system("git commit -am '" + commit_message + "'")
+	  		system("git push <branch> <branch>:master")
+			switch_to_master
+
+	  	end
 
   	 	my_parser = Parser.new
   	 	my_parser.score_parse(mastercopy)
