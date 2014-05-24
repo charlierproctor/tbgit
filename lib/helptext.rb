@@ -2,7 +2,7 @@ class HelpText
   	def helpme
   		puts ""
   		puts "TBGit is a command-line utility to facilitate the management of multiple GitHub student repositories."
-  		puts "			~ created by Charlie Proctor at 2014 YEI Tech Bootcamp"
+  		puts "			~ created by the teaching staff at 2014 YEI Tech Bootcamp"
   		puts "						~ partly based off of https://github.com/education/teachers_pet"
   		puts "	Commands:"
   		puts "		~ setup   	sets up a tbgit environment. See decription below"
@@ -13,6 +13,8 @@ class HelpText
   		puts "		~ each 		executes a specified series of commands on each local student branch"
   		puts "		~ spec 		runs rspec on specified files in a students repo"
   		puts ""
+      puts "    ~ add-webhooks    adds webhooks (on push events) to all student repositores"
+      puts ""
   		puts "		~ add-remotes  	adds each student's repository as a remote"
   		puts "		~ create-locals 	creates a local branch to track the students remote master branch"
   		puts "			^----> these are both part of the setup process"
