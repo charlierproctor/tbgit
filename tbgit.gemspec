@@ -23,4 +23,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rake"
   spec.add_development_dependency "json"
   spec.add_development_dependency "rubygems"
+  spec.add_development_dependency "highline/import"
 end

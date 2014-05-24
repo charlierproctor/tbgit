@@ -8,7 +8,7 @@ helptext = HelpText.new
 
 case ARGV[0] 
 when "setup"
-	tbgit.gather
+	tbgit.gather(ARGV[1],ARGV[2],ARGV[3])
 
 	tbgit.add_remotes
 	tbgit.spacer
@@ -26,29 +26,31 @@ when "setup"
 	tbgit.git_branch
 	tbgit.spacer
 when "pull"
-	tbgit.update_repos(ARGV[0])	
+	tbgit.update_repos(ARGV[0],ARGV[1])	
 when "push"
-	tbgit.update_repos(ARGV[0])	
+	tbgit.update_repos(ARGV[0],ARGV[1])	
 when "push-origin"
-	tbgit.push_origin
+	tbgit.push_origin(ARGV[1])
 when "merge"
-	tbgit.merge_and_commit
+	tbgit.merge_and_commit(ARGV[1],ARGV[2],ARGV[3])
 when "status"
 	tbgit.git_status
 when "each"
 	tbgit.on_each_gather
 when "spec"
-	tbgit.spec
+	tbgit.spec(ARGV[1],ARGV[2],ARGV[3],ARGV[4],ARGV[5])
 when "add-remotes"
-	tbgit.gather
+	tbgit.gather(ARGV[1],ARGV[2],ARGV[3])
 	tbgit.spacer
 
 	tbgit.add_remotes
 when "create-locals"
-	tbgit.gather
+	tbgit.gather(ARGV[1],ARGV[2],ARGV[3])
 	tbgit.spacer
 	
 	tbgit.create_local_tracking_remotes
+when "add-webhooks"
+	tbgit.add_webhooks(ARGV[1],ARGV[2],ARGV[3],ARGV[4],ARGV[5])
 else
 	helptext.helpme
 end

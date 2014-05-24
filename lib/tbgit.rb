@@ -1,6 +1,8 @@
 require "tbgit/version"
 require "tempfile"
 require "score_parser"
+require "add_webhooks"
+require 'highline/import'
 
 module Main
 
@@ -11,14 +13,16 @@ module Main
   	end
 
   	#confirms a given message
-  	def confirm(message)
-  		print message + " (y/n)  "
-  		response = $stdin.gets.chomp
-  		if response == 'y'
-  			#do nothing
-  		else
-  			exit
-  		end
+  	def confirm(flag,message)
+  		if flag != '-y'
+	  		print message + " (y/n)  "
+	  		response = $stdin.gets.chomp
+	  		if response == 'y'
+	  			#do nothing
+	  		else
+	  			exit
+	  		end
+	  	end
   	end
 
   	#three simple git methods
@@ -36,24 +40,36 @@ module Main
 	end
 
 	#gather necessary information
-    def gather
-    	puts 'Students file |../students|:'
-    	@students_file = $stdin.gets.chomp
-    	if @students_file == ""
-    		@students_file = "../students"
-    	end
+    def gather(students_file, organization, reponame)
+    	if students_file == nil
+	    	puts 'Students file |../students|:'
+	    	@students_file = $stdin.gets.chomp
+	    	if @students_file == ""
+	    		@students_file = "../students"
+	    	end
+	    else
+	    	@students_file = students_file
+	    end
 
-    	puts 'Organization name |yale-stc-developer-curriculum|:'
-    	@organization = $stdin.gets.chomp
-    	if @organization == ""
-    		@organization = "yale-stc-developer-curriculum"
-    	end
+	    if organization == nil
+	    	puts 'Organization name |yale-stc-developer-curriculum|:'
+	    	@organization = $stdin.gets.chomp
+	    	if @organization == ""
+	    		@organization = "yale-stc-developer-curriculum"
+	    	end
+	    else
+	    	@organization = organization
+	    end
 
-    	puts 'Student Repo Name |TechBootcampHomework|:'
-    	@reponame = $stdin.gets.chomp
-    	if @reponame == ""
-    		@reponame = "TechBootcampHomework"
-    	end
+	    if reponame == nil
+	    	puts 'Student Repo Name |TechBootcampHomework|:'
+	    	@reponame = $stdin.gets.chomp
+	    	if @reponame == ""
+	    		@reponame = "TechBootcampHomework"
+	    	end
+	    else
+	    	@reponame = reponame
+	    end
     end
 
     #update remotes
@@ -64,7 +80,6 @@ module Main
 
     #add each student repository as a remote
     def add_remotes
-    	confirm("Each student repository will be added as a remote. Continue?")
     	students = IO.readlines(@students_file)
     	students.each do |username|
 			username.delete!("\n")
@@ -78,7 +93,6 @@ module Main
 
 	#create local branches to track remote student repositories
  	def create_local_tracking_remotes
- 		confirm("Local branches will be created to track remote student repositories. Continue?")
  	    students = IO.readlines(@students_file)
  		students.each do |username|
 			username.delete!("\n")
@@ -103,30 +117,35 @@ module Main
 	end
 
 	#used for push / pull
-  	def update_repos(pushpull)
+  	def update_repos(pushpull,flag)
   		if pushpull == "push"
-  			confirm("Each local student branch will be pushed to their remote master branch. Continue?")
+  			confirm(flag,"Each local student branch will be pushed to their remote master branch. Continue?")
 			on_each_exec(["git push <branch> <branch>:master"])
   		else
-  			confirm("Each remote student master branch will be pulled to the local branch. Continue?")
+  			confirm(flag,"Each remote student master branch will be pulled to the local branch. Continue?")
 			on_each_exec(["git pull <branch> master"])
 		end
   	end
 
-  	def push_origin #push all student branches to our origin
-  		confirm("Each local student branch will be pushed to the the origin remote. Continue?")
+  	def push_origin(flag) #push all student branches to our origin
+  		confirm(flag,"Each local student branch will be pushed to the the origin remote. Continue?")
   		on_each_exec(["git push origin <branch>"])
   	end
 
   	#merges from master (or another branch) to each student branch and commits the changes
-  	def merge_and_commit
+  	def merge_and_commit(flag,merge_branch,message)
 
-  		confirm("A merge and commit will be performed on each local student branch (from the branch you specify). Continue?")
-  		puts "Merge from branch: "
-  		merge_branch = $stdin.gets.chomp
+  		confirm(flag,"A merge and commit will be performed on each local student branch (from the branch you specify). Continue?")
+  		
+  		if merge_branch == nil
+	  		puts "Merge from branch: "
+	  		merge_branch = $stdin.gets.chomp
+	  	end
 
-  		puts "Commit Message: "
-  		message = $stdin.gets.chomp
+	  	if message == nil
+	  		puts "Commit Message: "
+	  		message = $stdin.gets.chomp
+	  	end
 
 		commands = ["git merge --no-commit " + merge_branch.to_s,
 	  		  		"git add --all",
@@ -154,8 +173,8 @@ module Main
 
   	end
 
-  	#takes an array of commands, and executes each command on each student branch
-  	def on_each_exec(input)   
+  	#takes an array of commands, and executes a ruby command on each student branch
+  	def on_each_ruby(input)   
   		all_remotes = all_remotes_list
   		all_remotes.each do |branch|
   			branch.delete!("\n")
@@ -170,7 +189,7 @@ module Main
 	  				final_command = command.gsub("<branch>", branch)
 
 	  				puts final_command
-	  				system final_command
+	  				eval(final_command)
 	  			end
   			end
 
@@ -178,30 +197,44 @@ module Main
   		switch_to_master
   	end
 
-  	
+  	#takes an array of commands, and executes a system command on each student branch
+  	def on_each_exec(input)
+  		input.map! { |a| "system '" + a.gsub("'"){"\\'"} + "'"}
+  		on_each_ruby(input)
+  	end
+
   	def git_status
   		on_each_exec(["git status <branch>"])
   	end
   	
-  	def spec
-  		puts "Please specify the relative path from your pwd to the rspec file you would like to spec, eg. 'hw1/spec/spec.rb'"
-  		specfile = $stdin.gets.chomp
+  	def spec(flag,specfile,studentcopy,mastercopy,commit_message)
 
-  		puts "Where would you like to save each student's individual results?"
-  		puts "**Must be inside the student's repo directory, eg. 'hw1/spec/results.txt'**"
-  		studentcopy = $stdin.gets.chomp
+  		if 	specfile==nil
+	  		puts "Please specify the relative path from your pwd to the rspec file you would like to spec, eg. 'hw1/spec/spec.rb'"
+	  		specfile = $stdin.gets.chomp
+	  	end
 
-  		puts "In which folder would you like to save a copy of all results?"
-  		puts "**Must be outside the student's repo directory, eg. '../results'**"
-  		mastercopy = $stdin.gets.chomp
+	  	if studentcopy==nil
+	  		puts "Where would you like to save each student's individual results?"
+	  		puts "**Must be inside the student's repo directory, eg. 'hw1/spec/results.txt'**"
+	  		studentcopy = $stdin.gets.chomp
+	  	end
+
+	  	if mastercopy==nil
+	  		puts "In which folder would you like to save a copy of all results?"
+	  		puts "**Must be outside the student's repo directory, eg. '../results'**"
+	  		mastercopy = $stdin.gets.chomp
+	  	end
 
   		puts "mkdir " + mastercopy
   		system "mkdir " + mastercopy
 
-  		puts "Commit message (commiting each student's results to their repo):"
-  		commit_message = $stdin.gets.chomp
+  		if commit_message==nil
+	  		puts "Commit message (commiting each student's results to their repo):"
+	  		commit_message = $stdin.gets.chomp
+	  	end
 
-  		confirm("'rspec " + specfile + "' will be executed on each student's local branch. \
+  		confirm(flag,"'rspec " + specfile + "' will be executed on each student's local branch. \
   			Individual results will be saved to " + studentcopy + " and master results to " + mastercopy + ". Continue?")
 
   		on_each_exec(["rspec " +specfile + " > " + studentcopy,   	#overwrite
@@ -215,5 +248,34 @@ module Main
 
   	end
 
+  	def add_webhooks(organization,reponame,user,pass,url)
+  		if organization == nil
+  			puts "Organization Name:"
+  			organization = $stdin.gets.chomp
+  		end
+
+  		if reponame == nil
+  			puts "Student Repository Name:"
+  			reponame = $stdin.gets.chomp
+  		end
+
+  		if user == nil
+  			print "Username:"
+  			user = $stdin.gets.chomp
+  		end
+
+  		if pass == nil
+  			pass = ask("Password: ") { |q| q.echo = false }
+  		end
+
+  		if url == nil
+  			puts "Webhook url:"
+  			url = $stdin.gets.chomp
+  		end
+
+  		on_each_ruby(['create = CreateWebhooks.new; create.post(\''+ organization.to_s + '\',\'<branch>\',\''+reponame.to_s+'\',
+  				\''+user.to_s+'\',\''+pass.to_s+'\',\''+url.to_s+'\')'])
+
+  	end
   end #class
 end #module
