@@ -172,10 +172,10 @@ class TBGit
 
 		if pushpull == "push"
 			confirm(options[:yes],"Each local student branch will be pushed to their remote master branch. Continue?")
-		on_each_exec(["git push <branch> <branch>:master"])
+			on_each_exec(["git push <branch> <branch>:master"])
 		else
 			confirm(options[:yes],"Each remote student master branch will be pulled to the local branch. Continue?")
-		on_each_exec(["git pull <branch> master"])
+			on_each_exec(["git pull <branch> master"])
 	end
 	end
 
@@ -225,8 +225,6 @@ class TBGit
 	  end
 	end
 	opt_parser.parse!(args)
-
-		confirm(options[:yes],"A merge and commit will be performed on each local student branch (from the branch you specify). Continue?")
 		
 		if options[:branch] == nil
 			puts "Merge from branch: "
@@ -241,6 +239,8 @@ class TBGit
 		else
 			message = options[:message]
 		end
+
+		confirm(options[:yes],"A merge and commit will be performed on each local student branch (from the branch you specify). Continue?")
 
 	commands = ["git merge --no-commit " + merge_branch.to_s,
 			  		"git add --all",
@@ -272,8 +272,6 @@ class TBGit
 
 		opt_parser.parse!(args)
 
-		confirm(options[:yes], "The commands specified will be executed on each student branch. Continue?")
-
 		if options[:file] == nil
 			puts "Enter the commands you would like to have executed on each branch, one on each line."
 			puts "'<branch>' will be replaced by the current checked-out branch. Enter a blank line to finish."
@@ -290,6 +288,8 @@ class TBGit
 		else
 			input = IO.readlines(options[:file])
 		end
+
+		confirm(options[:yes], "The commands specified will be executed on each student branch. Continue?")
 
 		on_each_exec(input)
 
@@ -366,8 +366,6 @@ class TBGit
 		end
 		opt_parser.parse!(args)
 
-		confirm(options[:yes],"Webhooks will be added to each student's GitHub repository. Continue?")
-
 		if options[:organization] == nil
 			puts "Organization Name:"
 			organization = $stdin.gets.chomp
@@ -401,6 +399,8 @@ class TBGit
 		else
 			url = options[:url]
 		end
+
+		confirm(options[:yes],"Webhooks will be added to each student's GitHub repository. Continue?")
 
 		on_each_ruby(['create = CreateWebhooks.new; create.post(\''+ organization.to_s + '\',\'<branch>\',\''+reponame.to_s+'\',
 				\''+user.to_s+'\',\''+pass.to_s+'\',\''+url.to_s+'\')'])
