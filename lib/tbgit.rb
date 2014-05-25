@@ -3,6 +3,7 @@ require "tempfile"
 require "score_parser"
 require "add_webhooks"
 require 'highline/import'
+require "optparse"
 
 module Main
 
@@ -14,7 +15,7 @@ module Main
 
   	#confirms a given message
   	def confirm(flag,message)
-  		if flag != '-y'
+  		if !flag
 	  		print message + " (y/n)  "
 	  		response = $stdin.gets.chomp
 	  		if response == 'y'
@@ -40,35 +41,54 @@ module Main
 	end
 
 	#gather necessary information
-    def gather(students_file, organization, reponame)
-    	if students_file == nil
+    def gather(args)
+		options = {}
+		opt_parser = OptionParser.new do |opts|
+		  opts.banner = "Usage: tbgit setup [options]"
+
+		  opts.on("-s", "--studentfile FILEPATH","Specify the file containing the list of students.") do |f|
+		    options[:studentfile] = f
+		  end
+		  
+		  opts.on("-o", "--organization NAME","Specify the name of the GitHub organization.") do |o|
+		    options[:organization] = o
+		  end
+
+		  opts.on("-r", "--repo NAME","Specify the name of the student repositories.") do |r|
+		    options[:repo] = r
+		  end
+		end
+
+		opt_parser.parse!(args)
+
+    	if options[:studentfile] == nil
 	    	puts 'Students file |../students|:'
 	    	@students_file = $stdin.gets.chomp
 	    	if @students_file == ""
 	    		@students_file = "../students"
 	    	end
 	    else
-	    	@students_file = students_file
+	    	@students_file = options[:studentfile]
 	    end
 
-	    if organization == nil
+	    if options[:organization] == nil
 	    	puts 'Organization name |yale-stc-developer-curriculum|:'
 	    	@organization = $stdin.gets.chomp
 	    	if @organization == ""
 	    		@organization = "yale-stc-developer-curriculum"
 	    	end
 	    else
-	    	@organization = organization
+	    	@organization = options[:organization]
 	    end
 
-	    if reponame == nil
+	    if options[:repo] == nil
 	    	puts 'Student Repo Name |TechBootcampHomework|:'
 	    	@reponame = $stdin.gets.chomp
 	    	if @reponame == ""
 	    		@reponame = "TechBootcampHomework"
 	    	end
 	    else
-	    	@reponame = reponame
+	    	@reponame = options[:repo]
 	    end
     end
 
@@ -238,7 +258,7 @@ module Main
 	  		puts "Type 'all' to spec all student branches. Otherwise, please specify a student to spec."
 	  		student = $stdin.gets.chomp
 	  	end
-	  	
+
 	  	if student=="all"
 	  		confirm(flag,"'rspec " + specfile + "' will be executed on each student's local branch. 
 	  			Individual results will be saved to " + studentcopy + " and master results to " + mastercopy + ". Continue?")
