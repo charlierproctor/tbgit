@@ -2,9 +2,11 @@
 
 require 'tbgit'
 require 'helptext'
+require 'tbspec'
 
 tbgit = TBGit.new
 helptext = HelpText.new
+tbspec = TBSpec.new
 
 def version
 	puts "tbgit " + Gem.loaded_specs['tbgit'].version.to_s
@@ -42,7 +44,7 @@ when "status"
 when "each"
 	tbgit.on_each_gather(ARGV.drop(1))
 when "spec"
-	tbgit.spec(ARGV.drop(1))
+	tbspec.spec(ARGV.drop(1))
 when "add-remotes"
 	tbgit.gather(ARGV[0],ARGV.drop(1))
 	tbgit.spacer
