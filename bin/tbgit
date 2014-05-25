@@ -26,26 +26,26 @@ when "setup"
 	tbgit.git_branch
 	tbgit.spacer
 when "pull"
-	tbgit.update_repos(ARGV[0],ARGV[1])	
+	tbgit.update_repos(ARGV[0],ARGV.drop(1))	
 when "push"
-	tbgit.update_repos(ARGV[0],ARGV[1])	
+	tbgit.update_repos(ARGV[0],ARGV.drop(1))	
 when "push-origin"
-	tbgit.push_origin(ARGV[1])
+	tbgit.push_origin(ARGV.drop(1))
 when "merge"
-	tbgit.merge_and_commit(ARGV[1],ARGV[2],ARGV[3])
+	tbgit.merge_and_commit(ARGV.drop(1))
 when "status"
 	tbgit.git_status
 when "each"
 	tbgit.on_each_gather
 when "spec"
-	tbgit.spec(ARGV[1],ARGV[2],ARGV[3],ARGV[4],ARGV[5],ARGV[6])
+	tbgit.spec(ARGV.drop(1))
 when "add-remotes"
-	tbgit.gather(ARGV[1],ARGV[2],ARGV[3])
+	tbgit.gather(ARGV[0],ARGV.drop(1))
 	tbgit.spacer
 
 	tbgit.add_remotes
 when "create-locals"
-	tbgit.gather(ARGV[1],ARGV[2],ARGV[3])
+	tbgit.gather(ARGV[0],ARGV.drop(1))
 	tbgit.spacer
 	
 	tbgit.create_local_tracking_remotes

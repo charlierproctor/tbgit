@@ -41,10 +41,17 @@ module Main
 	end
 
 	#gather necessary information
-    def gather(args)
+    def gather(command, args)
 		options = {}
 		opt_parser = OptionParser.new do |opts|
-		  opts.banner = "Usage: tbgit setup [options]"
+			if command == "setup"
+		  		opts.banner = "Usage: tbgit setup [options]"
+		  	elsif command == "add-remotes"
+		  		opts.banner = "Usage: tbgit add-remotes [options]"
+		  	else
+		  		opts.banner = "Usage: tbgit create-locals [options]"
+		  	end
+
 
 		  opts.on("-s", "--studentfile FILEPATH","Specify the file containing the list of students.") do |f|
 		    options[:studentfile] = f
@@ -57,6 +64,11 @@ module Main
 		  opts.on("-r", "--repo NAME","Specify the name of the student repositories.") do |r|
 		    options[:repo] = r
 		  end
+
+		  opts.on_tail("-h", "--help", "Show this message") do
+	        puts opts
+	        exit
+	      end
 		end
 
 		opt_parser.parse!(args)
@@ -137,34 +149,100 @@ module Main
 	end
 
 	#used for push / pull
-  	def update_repos(pushpull,flag)
+  	def update_repos(pushpull,args)
+
+  		options = {}
+		opt_parser = OptionParser.new do |opts|
+			if pushpull == "push"
+		  		opts.banner = "Usage: tbgit push [options]"
+		  	else
+		  		opts.banner = "Usage: tbgit pull [options]"
+		  	end
+
+		  opts.on("-y", "--yes","Proceed without asking for confirmation") do |y|
+		    options[:yes] = y
+		  end
+
+		  opts.on_tail("-h", "--help", "Show this message") do
+	        puts opts
+	        exit
+	      end
+		
+		end
+
+		opt_parser.parse!(args)
+
+
   		if pushpull == "push"
-  			confirm(flag,"Each local student branch will be pushed to their remote master branch. Continue?")
+  			confirm(options[:yes],"Each local student branch will be pushed to their remote master branch. Continue?")
 			on_each_exec(["git push <branch> <branch>:master"])
   		else
-  			confirm(flag,"Each remote student master branch will be pulled to the local branch. Continue?")
+  			confirm(options[:yes],"Each remote student master branch will be pulled to the local branch. Continue?")
 			on_each_exec(["git pull <branch> master"])
 		end
   	end
 
-  	def push_origin(flag) #push all student branches to our origin
-  		confirm(flag,"Each local student branch will be pushed to the the origin remote. Continue?")
+  	def push_origin(args) #push all student branches to our origin
+
+  		options = {}
+		opt_parser = OptionParser.new do |opts|
+		  	opts.banner = "Usage: tbgit push-origin [options]"
+
+		  opts.on("-y", "--yes","Proceed without asking for confirmation") do |y|
+		    options[:yes] = y
+		  end
+
+		  opts.on_tail("-h", "--help", "Show this message") do
+	        puts opts
+	        exit
+	      end
+		end
+		opt_parser.parse!(args)
+
+  		confirm(options[:yes],"Each local student branch will be pushed to the the origin remote. Continue?")
   		on_each_exec(["git push origin <branch>"])
   	end
 
   	#merges from master (or another branch) to each student branch and commits the changes
-  	def merge_and_commit(flag,merge_branch,message)
+  	def merge_and_commit(args)
 
-  		confirm(flag,"A merge and commit will be performed on each local student branch (from the branch you specify). Continue?")
+  		options = {}
+		opt_parser = OptionParser.new do |opts|
+		  	opts.banner = "Usage: tbgit push-origin [options]"
+
+		  opts.on("-y", "--yes","Proceed without asking for confirmation") do |y|
+		    options[:yes] = y
+		  end
+
+		  opts.on("-b", "--branch BRANCH", "Specify the branch to merge from") do |b|
+		  	options[:branch] = b
+		  end
+
+		  opts.on("-m", "--message MESSAGE", "Specify the commit message for the merge.") do |m|
+		  	options[:message] = m 
+		  end
+
+		  opts.on_tail("-h", "--help", "Show this message") do
+	        puts opts
+	        exit
+	      end
+		end
+		opt_parser.parse!(args)
+
+  		confirm(options[:yes],"A merge and commit will be performed on each local student branch (from the branch you specify). Continue?")
   		
-  		if merge_branch == nil
+  		if options[:branch] == nil
 	  		puts "Merge from branch: "
 	  		merge_branch = $stdin.gets.chomp
+	  	else
+	  		merge_branch = options[:branch]
 	  	end
 
-	  	if message == nil
+	  	if options[:message] == nil
 	  		puts "Commit Message: "
 	  		message = $stdin.gets.chomp
+	  	else
+	  		message = options[:message]
 	  	end
 
 		commands = ["git merge --no-commit " + merge_branch.to_s,
@@ -227,40 +305,104 @@ module Main
   		on_each_exec(["git status <branch>"])
   	end
   	
-  	def spec(flag,specfile,studentcopy,mastercopy,commit_message,student)
+  	def spec(args)
 
-  		if 	specfile==nil
+  		options = {}
+		opt_parser = OptionParser.new do |opts|
+		  	opts.banner = "Usage: tbgit spec [options]"
+
+		  opts.on("-y", "--yes","Proceed without asking for confirmation") do |y|
+		    options[:yes] = y
+		  end
+
+		  opts.on("-f", "--specfile FILE", "Specify the relative path from your pwd 
+		  	to the rspec file you would like to spec, eg. 'hw1/spec/spec.rb'") do |f|
+		  	options[:specfile] = f
+		  end
+
+		  opts.on("-s", "--studentcopy FILE", "Specify where you would like to save each 
+		  	student's individual results. Must be inside the student's repo directory,
+		  	eg. 'hw1/spec/results.txt'") do |s|
+		  	options[:studentcopy] = s 
+		  end
+
+		  opts.on("-t", "--teachercopy FILE", "Specify where you would like to save a copy
+		  	of all results. Must be outside the student's repo directory, eg. '../results'") do |t|
+		  	options[:mastercopy] = t
+		  end
+
+		  opts.on("-m", "--message MESSAGE", "Specify the commit message 
+		  	(commiting each student's results to their repo)") do |m|
+		  	options[:message] = m 
+		  end
+
+		  opts.on("-n", "--studentname NAME", "If you would like to spec an individual student,
+		  	please specify their name. Otherwise, use the --all option to spec all students.") do |n|
+		  	options[:student] = n 
+		  end
+
+		  opts.on("-a", "--all", "Use this option to spec all student homework.")
+
+		  opts.on_tail("-h", "--help", "Show this message") do
+	        puts opts
+	        exit
+	      end
+		end
+
+		opt_parser.parse!(args)
+
+  		if 	options[:specfile]==nil
 	  		puts "Please specify the relative path from your pwd to the rspec file you would like to spec, eg. 'hw1/spec/spec.rb'"
 	  		specfile = $stdin.gets.chomp
+	  	else
+	  		specfile = options[:specfile]
 	  	end
 
-	  	if studentcopy==nil
+	  	if options[:studentcopy]==nil
 	  		puts "Where would you like to save each student's individual results?"
 	  		puts "**Must be inside the student's repo directory, eg. 'hw1/spec/results.txt'**"
 	  		studentcopy = $stdin.gets.chomp
+	  	else
+	  		studentcopy = options[:studentcopy]
 	  	end
 
-	  	if mastercopy==nil
+	  	if options[:mastercopy]==nil
 	  		puts "In which folder would you like to save a copy of all results?"
 	  		puts "**Must be outside the student's repo directory, eg. '../results'**"
 	  		mastercopy = $stdin.gets.chomp
+	  	else
+	  		mastercopy = options[:mastercopy]
 	  	end
 
   		puts "mkdir " + mastercopy
   		system "mkdir " + mastercopy
 
-  		if commit_message==nil
+  		if options[:message]==nil
 	  		puts "Commit message (commiting each student's results to their repo):"
 	  		commit_message = $stdin.gets.chomp
+	  	else
+	  		commit_message = options[:message]
 	  	end
 
-	  	if student==nil
-	  		puts "Type 'all' to spec all student branches. Otherwise, please specify a student to spec."
+	  	all = false
+	  	student = ""
+	  	if options[:student]==nil && !options[:all]
+	  		puts "Please specify a student to spec. Type 'all' to spec all students"
 	  		student = $stdin.gets.chomp
+	  	elsif options[:student]!=nil && !options[:all]
+	  		student = options[:student]
+	  	elsif options[:student]!=nil && options[:all]
+	  		raise "-n,--student and -a,--all cannot be used at the same time!"
+	  	else
+	  		all = true
 	  	end
 
-	  	if student=="all"
-	  		confirm(flag,"'rspec " + specfile + "' will be executed on each student's local branch. 
+	  	if student == "all"
+	  		all = true
+	  	end
+
+	  	if  all
+	  		confirm(options[:yes],"'rspec " + specfile + "' will be executed on each student's local branch. 
 	  			Individual results will be saved to " + studentcopy + " and master results to " + mastercopy + ". Continue?")
 
 	  		on_each_exec(["rspec " +specfile + " > " + studentcopy,   	#overwrite
