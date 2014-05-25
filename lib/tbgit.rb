@@ -251,19 +251,45 @@ class TBGit
 	end
 
 	#gathers the commands to be executed, and then calls on_each_exec(input)
-	def on_each_gather
+	def on_each_gather(args)
 
-		puts "Enter the commands you would like to have executed on each branch, one on each line."
-		puts "'<branch>' will be replaced by the current checked-out branch. Enter a blank line to finish."
-		done = false
-		input = Array.new
-		while !done
-			text = $stdin.gets.chomp
-			if text == ""
-				done = true
-			else
-				input << text
+		options = {}
+		opt_parser = OptionParser.new do |opts|
+
+		  opts.on("-f", "--file FILENAME", "Execute the commands specified in a certain file. One command per line. '<branch>' will be replaced by the name of the current student branch checked out.") do |f|
+		  	options[:file] = f
+		  end
+
+		  opts.on("-y", "--yes","Proceed without asking for confirmation") do |y|
+		    options[:yes] = y
+		  end
+
+		  opts.on_tail("-h", "--help", "Show this message") do
+		    puts opts
+		    exit
+		  end
+
+		end
+
+		opt_parser.parse!(args)
+
+		confirm(options[:yes], "The commands specified will be executed on each student branch. Continue?")
+
+		if options[:file] == nil
+			puts "Enter the commands you would like to have executed on each branch, one on each line."
+			puts "'<branch>' will be replaced by the current checked-out branch. Enter a blank line to finish."
+			done = false
+			input = Array.new
+			while !done
+				text = $stdin.gets.chomp
+				if text == ""
+					done = true
+				else
+					input << text
+				end
 			end
+		else
+			input = IO.readlines(options[:file])
 		end
 
 		on_each_exec(input)

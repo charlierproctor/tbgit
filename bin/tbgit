@@ -40,7 +40,7 @@ when "merge"
 when "status"
 	tbgit.git_status
 when "each"
-	tbgit.on_each_gather
+	tbgit.on_each_gather(ARGV.drop(1))
 when "spec"
 	tbgit.spec(ARGV.drop(1))
 when "add-remotes"
