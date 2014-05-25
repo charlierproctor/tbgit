@@ -38,6 +38,10 @@ class TBSpec
 	  	options[:all] = a
 	  end
 
+	  opts.on("--most-recent", "Use this option to spec the student with the most recent commit.") do |m|
+	  	options[:most_recent] = m
+	  end
+
 	  opts.on_tail("-h", "--help", "Show this message") do
 	    puts opts
 	    exit
@@ -81,7 +85,16 @@ class TBSpec
 
 		all = false
 		student = ""
-		if options[:student]==nil && !options[:all]
+		if options[:most_recent]
+			most_recent_file = Tempfile.new("recent")
+
+			command = "git for-each-ref --sort=-committerdate refs/heads/ --format='%(refname:short)' >> " + most_recent_file.path
+			system command
+			puts command
+			array = IO.readlines(most_recent_file)
+
+			student = array[0].chomp
+		elsif options[:student]==nil && !options[:all]
 			puts "Please specify a student to spec. Type 'all' to spec all students"
 			student = $stdin.gets.chomp
 		elsif options[:student]!=nil && !options[:all]
