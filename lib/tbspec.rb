@@ -42,6 +42,10 @@ class TBSpec
 	  	options[:most_recent] = m
 	  end
 
+	  opts.on("-c", "--check USERNAME", "Check to make sure that the most recent commit was NOT from the specified user.") do |u|
+	  	options[:check] = u
+	  end
+
 	  opts.on_tail("-h", "--help", "Show this message") do
 	    puts opts
 	    exit
@@ -122,18 +126,25 @@ class TBSpec
 			 	"git push <branch> <branch>:master"])
 		else
 			system("git checkout " + student)
-			puts "rspec " + specfile + " > " + studentcopy
-			system("rspec " + specfile + " > " + studentcopy)
-			puts "rspec --format json --out " + mastercopy + "/"+student+" " + specfile
-			system("rspec --format json --out " + mastercopy + "/"+student+" " + specfile)
-			puts "git add --all"
-			system("git add --all")
-			puts "git commit -am '" + commit_message + "'"
-			system("git commit -am '" + commit_message + "'")
-			puts "git push "+student+" "+student+":master"
-			system("git push "+student+" "+student+":master")
-		tbgit.switch_to_master
-
+			if options[:check]!=nil
+				output = system("git log -1 | egrep " + options[:check])
+				if output!=nil && output != ""
+					#do nothing
+				else 
+					puts "rspec " + specfile + " > " + studentcopy
+					system("rspec " + specfile + " > " + studentcopy)
+					puts "rspec --format json --out " + mastercopy + "/"+student+" " + specfile
+					system("rspec --format json --out " + mastercopy + "/"+student+" " + specfile)
+					puts "git add --all"
+					system("git add --all")
+					puts "git commit -am '" + commit_message + "'"
+					system("git commit -am '" + commit_message + "'")
+					puts "git push "+student+" "+student+":master"
+					system("git push "+student+" "+student+":master")
+					
+					tbgit.switch_to_master
+				end
+			end
 		end
 
 	 	my_parser = Parser.new
