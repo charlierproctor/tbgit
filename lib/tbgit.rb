@@ -112,9 +112,8 @@ class TBGit
 	students = IO.readlines(@students_file)
 	students.each do |username|
 		username.delete!("\n")
-		
 		puts "Adding Remote: " + username 
-		remote_command = "git remote add " + username + " https://github.com/"+@organization+"/" + username + "-"+@reponame+".git" 
+		remote_command = "git remote add " + username + " ssh://git@github.com:"+@organization+"/" + username + "-"+@reponame+".git" 
 		puts remote_command
 		system 	remote_command
 	end
