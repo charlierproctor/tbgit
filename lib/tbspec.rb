@@ -46,6 +46,10 @@ class TBSpec
 	  	options[:check] = u
 	  end
 
+	  opts.on("-o", "--on-completion COMMAND", "On completion of rspec testing, execute the specified command.") do |o|
+	  	options[:on_completion] = 0
+	  end
+
 	  opts.on_tail("-h", "--help", "Show this message") do
 	    puts opts
 	    exit
@@ -146,6 +150,10 @@ class TBSpec
 				system("git commit -am '" + commit_message + "'")
 				puts "git push "+student+" "+student+":master"
 				system("git push "+student+" "+student+":master")
+				if options[:on_completion] != nil
+					puts options[:on_completion]
+					system(options[:on_completion])
+				end
 			end
 		end
 
