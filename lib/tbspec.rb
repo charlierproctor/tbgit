@@ -146,8 +146,6 @@ class TBSpec
 				system("git commit -am '" + commit_message + "'")
 				puts "git push "+student+" "+student+":master"
 				system("git push "+student+" "+student+":master")
-				
-				tbgit.switch_to_master
 			end
 		end
 
