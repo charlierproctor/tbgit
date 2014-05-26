@@ -47,7 +47,7 @@ class TBSpec
 	  end
 
 	  opts.on("-o", "--on-completion COMMAND", "On completion of rspec testing, execute the specified command.") do |o|
-	  	options[:on_completion] = 0
+	  	options[:on_completion] = o
 	  end
 
 	  opts.on_tail("-h", "--help", "Show this message") do
