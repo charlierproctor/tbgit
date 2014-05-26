@@ -126,24 +126,28 @@ class TBSpec
 			 	"git push <branch> <branch>:master"])
 		else
 			system("git checkout " + student)
+			output = ""
 			if options[:check]!=nil
-				output = system("git log -1 | egrep " + options[:check])
-				if output!=nil && output != ""
-					#do nothing
-				else 
-					puts "rspec " + specfile + " > " + studentcopy
-					system("rspec " + specfile + " > " + studentcopy)
-					puts "rspec --format json --out " + mastercopy + "/"+student+" " + specfile
-					system("rspec --format json --out " + mastercopy + "/"+student+" " + specfile)
-					puts "git add --all"
-					system("git add --all")
-					puts "git commit -am '" + commit_message + "'"
-					system("git commit -am '" + commit_message + "'")
-					puts "git push "+student+" "+student+":master"
-					system("git push "+student+" "+student+":master")
-					
-					tbgit.switch_to_master
-				end
+				puts "Checking to make sure last commit was not authored by: " + options[:check]
+				egrep = "git log -1 | egrep " + options[:check]
+				puts egrep
+				output = system(egrep)
+			end
+			if output
+				#do nothing
+			else 
+				puts "rspec " + specfile + " > " + studentcopy
+				system("rspec " + specfile + " > " + studentcopy)
+				puts "rspec --format json --out " + mastercopy + "/"+student+" " + specfile
+				system("rspec --format json --out " + mastercopy + "/"+student+" " + specfile)
+				puts "git add --all"
+				system("git add --all")
+				puts "git commit -am '" + commit_message + "'"
+				system("git commit -am '" + commit_message + "'")
+				puts "git push "+student+" "+student+":master"
+				system("git push "+student+" "+student+":master")
+				
+				tbgit.switch_to_master
 			end
 		end
 
